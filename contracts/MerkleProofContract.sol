@@ -1,23 +1,25 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
-import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 
 
-contract MerkleProofContract is  ERC721, ERC721URIStorage {
-    bytes32 public rootHash;
+contract MerkleProofContract is  ERC721, ERC721URIStorage{
+    
+    bytes32 public rootHash;//this will be generate either from front end or backend
 
     uint public nftCount=0;
     
     constructor(bytes32 _rootHash)  ERC721("Student Certificate", "SCT"){
-        rootHash = _rootHash;
-    }
+        rootHash == _rootHash;
+   }
 
 
 
       function mintNFT(address _to, string memory uri,bytes32[] calldata proof) public {
+
       bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
         require(
             MerkleProof.verify(proof, rootHash,leaf),

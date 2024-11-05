@@ -3,11 +3,11 @@ const { loadFixture } = require("@nomicfoundation/hardhat-toolbox/network-helper
 const { expect } = require("chai");
 const { MerkleTree } = require("merkletreejs");
 const keccak256 = require("keccak256");
+const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 
 describe("MerkleProof", function () {
   async function runEveryTime() {
     const [owner, addr1, addr2] = await ethers.getSigners(); // Get signers
-
     const whitelistAddresses = [owner.address, addr1.address]; // Whitelisted addresses
     const leaves = whitelistAddresses.map(addr => keccak256(addr)); // Create leaves from addresses
     const tree = new MerkleTree(leaves, keccak256, { sortPairs: true }); // Create Merkle tree
@@ -47,10 +47,26 @@ describe("MerkleProof", function () {
       ).to.be.revertedWith("Not WhiteListed Address");
     });
 
-    // it("Should check address is whitlisted", async function () {
-    //   const { merkleContract, uri, tree, addr1, whitelistAddresses} = await loadFixture(runEveryTime);
+    //it should if address is not whitelisted 
+    it("Should fail if address is not whitelisted", async function(){
+      const { merkleContract, uri, tree, addr2 ,addr1} = await loadFixture(runEveryTime);
 
-    //   expect(await ).to.equal(whitelistAddresses);
-    // });
+      const leaf = keccak256(addr2.address); //  leaf for addr2
+      const proof = tree.getHexProof(leaf);
+      // Expect minting to fail for addr2 (non-whitelisted address)
+      await expect(
+        merkleContract.connect(addr1).mintNFT(addr2.address, uri, proof)
+      ).to.be.revertedWith("Not WhiteListed Address");
+    })
+    
+    it('Should return correct name and symbol', async function () {
+      const { merkleContract} = await loadFixture(runEveryTime);
+      expect(await merkleContract.name()).to.equal(
+        'Student Certificate'
+      );
+      expect(await merkleContract.symbol()).to.equal('SCT');
+    });
+
+    
   });
 });
