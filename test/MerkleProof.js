@@ -67,6 +67,21 @@ describe("MerkleProof", function () {
       expect(await merkleContract.symbol()).to.equal('SCT');
     });
 
+    /////////////////////////
+    it("Should allow  whitelisted address to mint NFT", async function () {
+      const { merkleContract, uri, tree, addr1 } = await loadFixture(runEveryTime);
+
+      const leaf = keccak256(addr1.address); // leaf for addr1
+      const proof = tree.getHexProof(leaf); // proof for addr1 (which is whitelisted)
+
+      // Expect minting to succeed for addr1 (whitelisted address)
+      await expect(
+        merkleContract.connect(addr1).mintNFT(addr1.address, uri, proof)
+      ).to.emit(merkleContract, "NftMinted").withArgs(addr1.address, anyValue); ;
+
+      
+
     
   });
-});
+
+})})

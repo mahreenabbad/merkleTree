@@ -11,9 +11,11 @@ contract MerkleProofContract is  ERC721, ERC721URIStorage{
     bytes32 public rootHash;//this will be generate either from front end or backend
 
     uint public nftCount=0;
+
+    event NftMinted(address to, uint tokenId);
     
     constructor(bytes32 _rootHash)  ERC721("Student Certificate", "SCT"){
-        rootHash == _rootHash;
+        rootHash = _rootHash;
    }
 
 
@@ -29,6 +31,7 @@ contract MerkleProofContract is  ERC721, ERC721URIStorage{
         
         _safeMint(_to, nftCount);
         _setTokenURI(nftCount, uri);
+        emit NftMinted(msg.sender, nftCount);
            nftCount++;
         }
     
